@@ -17,11 +17,11 @@ module.exports = {
         return response.json(incidents);
     },
     async create(request, response){
-        const{ tittle, description, value } = request.body;
+        const{ title, description, value } = request.body;
         const ong_id = request.headers.authorization;
 
         const [id] = await connection('incidents').insert({
-            tittle,
+            title,
             description,
             value,
             ong_id,
@@ -33,10 +33,13 @@ module.exports = {
         const { id } = request.params;
         const ong_id = request.headers.authorization;
 
-        const incident = await connection('incidents').where('id', id).select('ong_id').first();
+        const incident = await connection('incidents')
+            .where('id', id)
+            .select('ong_id')
+            .first();
         
         if (incident.ong_id !== ong_id){
-            return response.status(401).jspn({ error: 'Operation not permitted.'})
+            return response.status(401).json({ error: 'Operation not permitted.'});
         }
 
         await connection('incidents').where('id', id).delete();
